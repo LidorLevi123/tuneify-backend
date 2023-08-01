@@ -8,7 +8,7 @@ const router = express.Router()
 // We can add a middleware for the entire router:
 // router.use(requireAuth)
 
-router.get('/', getStations)
+router.get('/', log, getStations)
 router.get('/:id', getStationById)
 router.post('/', requireAuth, addStation)
 router.put('/:id', requireAuth, updateStation)
