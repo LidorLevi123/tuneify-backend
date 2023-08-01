@@ -3,13 +3,13 @@ import {logger} from '../../services/logger.service.js'
 
 export async function getStations(req, res) {
   try {
+
     logger.debug('Getting Stations:', req.query)
     // const filterBy = {
     //   txt: req.query.txt || '',
     //   pageIdx: req.query.pageIdx
     // }
 
-    console.log('station controller')
 
     const stations = await stationService.query()
     res.json(stations)

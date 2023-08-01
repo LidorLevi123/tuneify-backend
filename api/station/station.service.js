@@ -23,8 +23,6 @@ async function query(filterBy = { txt:'' }) {
 
         const stations = stationCursor.toArray()
 
-        console.log('stations from backend', stations)
-
         return stations
     } catch (err) {
         logger.error('cannot find stations', err)
