@@ -11,7 +11,6 @@ const server = http.createServer(app)
 app.use(cookieParser())
 app.use(express.json())
 
-
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.resolve('public')))
 } else {
@@ -28,9 +27,9 @@ if (process.env.NODE_ENV === 'production') {
 
 import { authRoutes } from './api/auth/auth.routes.js'
 import { userRoutes } from './api/user/user.routes.js'
-import { reviewRoutes } from './api/review/review.routes.js'
 import { stationRoutes } from './api/station/station.routes.js'
-import { setupSocketAPI } from './services/socket.service.js'
+// import { reviewRoutes } from './api/review/review.routes.js'
+// import { setupSocketAPI } from './services/socket.service.js'
 
 // routes
 import { setupAsyncLocalStorage } from './middlewares/setupAls.middleware.js'
@@ -38,9 +37,9 @@ app.all('*', setupAsyncLocalStorage)
 
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
-app.use('/api/review', reviewRoutes)
 app.use('/api/station', stationRoutes)
-setupSocketAPI(server)
+// app.use('/api/review', reviewRoutes)
+// setupSocketAPI(server)
 
 // Make every server-side-route to match the index.html
 // so when requesting http://localhost:3030/index.html/station/123 it will still respond with

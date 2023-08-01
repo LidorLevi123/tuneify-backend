@@ -4,11 +4,12 @@ import {logger} from '../../services/logger.service.js'
 export async function getStations(req, res) {
   try {
     logger.debug('Getting Stations:', req.query)
-    const filterBy = {
-      txt: req.query.txt || '',
-      pageIdx: req.query.pageIdx
-    }
-    const stations = await stationService.query(filterBy)
+    // const filterBy = {
+    //   txt: req.query.txt || '',
+    //   pageIdx: req.query.pageIdx
+    // }
+
+    const stations = await stationService.query()
     res.json(stations)
   } catch (err) {
     logger.error('Failed to get stations', err)

@@ -7,11 +7,13 @@ const {ObjectId} = mongodb
 const PAGE_SIZE = 3
 
 
-async function query(filterBy={txt:''}) {
+async function query(filterBy = { txt:'' }) {
     try {
+
         const criteria = {
-            vendor: { $regex: filterBy.txt, $options: 'i' }
+            // vendor: { $regex: filterBy.txt, $options: 'i' }
         }
+
         const collection = await dbService.getCollection('station')
         var stationCursor = await collection.find(criteria)
 
