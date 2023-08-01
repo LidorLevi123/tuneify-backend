@@ -9,6 +9,8 @@ export async function getStations(req, res) {
     //   pageIdx: req.query.pageIdx
     // }
 
+    console.log('station controller')
+
     const stations = await stationService.query()
     res.json(stations)
   } catch (err) {

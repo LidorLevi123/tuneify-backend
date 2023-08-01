@@ -22,6 +22,9 @@ async function query(filterBy = { txt:'' }) {
         }
 
         const stations = stationCursor.toArray()
+
+        console.log('stations from backend', stations)
+
         return stations
     } catch (err) {
         logger.error('cannot find stations', err)
@@ -65,8 +68,8 @@ async function add(station) {
 async function update(station) {
     try {
         const stationToSave = {
-            vendor: station.vendor,
-            price: station.price
+            // vendor: station.vendor,
+            // price: station.price
         }
         const collection = await dbService.getCollection('station')
         await collection.updateOne({ _id: ObjectId(station._id) }, { $set: stationToSave })
