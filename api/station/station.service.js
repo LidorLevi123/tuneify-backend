@@ -73,7 +73,7 @@ async function update(station) {
         await collection.updateOne({ _id: ObjectId(station._id) }, { $set: stationToSave })
         return station
     } catch (err) {
-        logger.error(`cannot update station ${stationId}`, err)
+        logger.error(`cannot update station ${station._id}`, err)
         throw err
     }
 }

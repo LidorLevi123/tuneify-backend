@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 
 import {userService} from '../user/user.service.js'
 import {logger} from '../../services/logger.service.js'
+import { stationService } from '../station/station.service.js'
 
 const cryptr = new Cryptr(process.env.SECRET || 'Secret-Puk-1234')
 
@@ -27,7 +28,7 @@ async function login(username, password) {
     return user
 }
 
-async function signup({username, password, fullname, imgUrl}) {
+async function signup({username, password, fullname, imgUrl }) {
     const saltRounds = 10
 
     logger.debug(`auth.service - signup with username: ${username}, fullname: ${fullname}`)
@@ -37,7 +38,11 @@ async function signup({username, password, fullname, imgUrl}) {
     if (userExist) return Promise.reject('Username already taken')
 
     const hash = await bcrypt.hash(password, saltRounds)
-    return userService.add({ username, password: hash, fullname, imgUrl })
+
+    const user = await userService.add({ username, password: hash, fullname, imgUrl, stationIds: [] })
+    console.log(user)
+    const likedStation = await _createLikedSongs({fullname, _id: user._id, imgUrl })
+    return await userService.update({ ...user, likedId: likedStation._id})
 }
 
 function getLoginToken(user) {
@@ -55,6 +60,17 @@ function validateToken(loginToken) {
         console.log('Invalid login token')
     }
     return null
+}
+
+async function _createLikedSongs(owner) {
+    const likedSongs = {
+        name: 'Liked Songs',
+        description: '',
+        imgUrl: 'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
+        owner,
+        tracks: []
+    }
+    return await stationService.add(likedSongs)
 }
 
 // ;(async ()=>{
