@@ -4,45 +4,45 @@ import { utilService } from './util.service.js'
 
 
 
-export const carService = {
+export const stationService = {
     query,
     getById,
     save,
     remove,
-    getEmptyCar,
-    addCarMsg
+    getEmptyStation,
+    addStationMsg
 }
-window.cs = carService
+window.cs = stationService
 
 
 async function query(filterBy = { txt: '', price: 0 }) {
-    return httpService.get('car', filterBy)
+    return httpService.get('station', filterBy)
 }
-function getById(carId) {
-    return httpService.get(`car/${carId}`)
+function getById(stationId) {
+    return httpService.get(`station/${stationId}`)
 }
 
-async function remove(carId) {
-    return httpService.delete(`car/${carId}`)
+async function remove(stationId) {
+    return httpService.delete(`station/${stationId}`)
 }
-async function save(car) {
-    var savedCar
-    if (car._id) {
-        savedCar = await httpService.put(`car/${car._id}`, car)
+async function save(station) {
+    var savedStation
+    if (station._id) {
+        savedStation = await httpService.put(`station/${station._id}`, station)
 
     } else {
-        savedCar = await httpService.post('car', car)
+        savedStation = await httpService.post('station', station)
     }
-    return savedCar
+    return savedStation
 }
 
-async function addCarMsg(carId, txt) {
-    const savedMsg = await httpService.post(`car/${carId}/msg`, {txt})
+async function addStationMsg(stationId, txt) {
+    const savedMsg = await httpService.post(`station/${stationId}/msg`, {txt})
     return savedMsg
 }
 
 
-function getEmptyCar() {
+function getEmptyStation() {
     return {
         vendor: 'Susita-' + (Date.now() % 1000),
         price: utilService.getRandomIntInclusive(1000, 9000),
