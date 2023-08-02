@@ -35,7 +35,8 @@ export async function addStation(req, res) {
 
   try {
     const station = req.body
-    station.owner = loggedinUser
+    if(station.isEmpty) station.owner = loggedinUser
+    delete station.isEmpty
     const addedStation = await stationService.add(station)
     res.json(addedStation)
   } catch (err) {

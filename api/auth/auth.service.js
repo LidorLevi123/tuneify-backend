@@ -40,13 +40,12 @@ async function signup({username, password, fullname, imgUrl }) {
     const hash = await bcrypt.hash(password, saltRounds)
 
     const user = await userService.add({ username, password: hash, fullname, imgUrl, stationIds: [] })
-    console.log(user)
     const likedStation = await _createLikedSongs({fullname, _id: user._id, imgUrl })
     return await userService.update({ ...user, likedId: likedStation._id})
 }
 
 function getLoginToken(user) {
-    const userInfo = {_id : user._id, fullname: user.fullname, isAdmin: user.isAdmin}
+    const userInfo = {_id: user._id, fullname: user.fullname, isAdmin: user.isAdmin}
     return cryptr.encrypt(JSON.stringify(userInfo))    
 }
 
@@ -64,6 +63,7 @@ function validateToken(loginToken) {
 
 async function _createLikedSongs(owner) {
     const likedSongs = {
+        _id: makeId(),
         name: 'Liked Songs',
         description: '',
         imgUrl: 'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
@@ -71,6 +71,17 @@ async function _createLikedSongs(owner) {
         tracks: []
     }
     return await stationService.add(likedSongs)
+}
+
+function makeId(length = 24) {
+    var txt = ''
+    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+    for (var i = 0; i < length; i++) {
+        txt += possible.charAt(Math.floor(Math.random() * possible.length))
+    }
+
+    return txt
 }
 
 // ;(async ()=>{
