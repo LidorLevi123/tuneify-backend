@@ -2,26 +2,45 @@ import {dbService} from '../../services/db.service.js'
 import {logger} from '../../services/logger.service.js'
 import {utilService} from '../../services/util.service.js'
 import mongodb from 'mongodb'
-const {ObjectId} = mongodb
+
+const { ObjectId } = mongodb
 
 const PAGE_SIZE = 3
 
 
-async function query(filterBy = { txt:'' }) {
+// async function query() {
+//     try {
+
+//         const collection = await dbService.getCollection('station')
+//         var stationCursor = await collection.find(criteria)
+
+//         const stations = stationCursor.toArray()
+
+//         return stations
+//     } catch (err) {
+//         logger.error('cannot find stations', err)
+//         throw err
+//     }
+// }
+
+async function query(userId) {
     try {
+        const userCollection = await dbService.getCollection('user')
+        const user = await userCollection.findOne({ _id: ObjectId(userId) })
 
-        const criteria = {
-            // vendor: { $regex: filterBy.txt, $options: 'i' }
-        }
+        const likedStationId = ObjectId(user.likedId)
+        const stationIds = user.stationIds.map(id => ObjectId(id))
 
-        const collection = await dbService.getCollection('station')
-        var stationCursor = await collection.find(criteria)
+        const stationCollection = await dbService.getCollection('station')
+        const stationCursor = await stationCollection.find({
+            _id: { $in: [likedStationId, ...stationIds] }
+        })
 
-        if (filterBy.pageIdx !== undefined) {
-            stationCursor.skip(filterBy.pageIdx * PAGE_SIZE).limit(PAGE_SIZE)
-        }
+        const stations = await stationCursor.toArray()
+        const likedStationIndex = stations.findIndex(station => station._id.equals(likedStationId))
 
-        const stations = stationCursor.toArray()
+        const likedStation = stations.splice(likedStationIndex, 1)[0]
+        stations.unshift(likedStation)
 
         return stations
     } catch (err) {

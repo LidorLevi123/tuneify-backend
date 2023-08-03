@@ -5,13 +5,13 @@ export async function getStations(req, res) {
   try {
 
     logger.debug('Getting Stations:', req.query)
+
     // const filterBy = {
     //   txt: req.query.txt || '',
     //   pageIdx: req.query.pageIdx
     // }
 
-
-    const stations = await stationService.query()
+    const stations = await stationService.query(req.query.userId)
     res.json(stations)
   } catch (err) {
     logger.error('Failed to get stations', err)
@@ -22,7 +22,6 @@ export async function getStations(req, res) {
 export async function getStationById(req, res) {
   try {
     const stationId = req.params.id
-    console.log(stationId.length)
     const station = await stationService.getById(stationId)
     res.json(station)
   } catch (err) {
