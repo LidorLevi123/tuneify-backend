@@ -33,7 +33,9 @@ async function query(filterBy = { txt:'' }) {
 async function getById(stationId) {
     try {
         const collection = await dbService.getCollection('station')
-        const station = await collection.findOne({ _id: stationId })
+        let station
+        if(stationId.length < 24) station = await collection.findOne({ spotifyId: stationId })
+        else station = await collection.findOne({ _id: ObjectId(stationId) })
         return station
     } catch (err) {
         logger.error(`while finding station ${stationId}`, err)
@@ -44,7 +46,7 @@ async function getById(stationId) {
 async function remove(stationId) {
     try {
         const collection = await dbService.getCollection('station')
-        await collection.deleteOne({ _id: stationId })
+        await collection.deleteOne({ _id: ObjectId(stationId) })
         return stationId
     } catch (err) {
         logger.error(`cannot remove station ${stationId}`, err)
@@ -71,7 +73,7 @@ async function update(station) {
             tracks: station.tracks,
         }
         const collection = await dbService.getCollection('station')
-        await collection.updateOne({ _id: station._id }, { $set: stationToSave })
+        await collection.updateOne({ _id: ObjectId(station._id) }, { $set: stationToSave })
         return station
     } catch (err) {
         logger.error(`cannot update station ${station._id}`, err)

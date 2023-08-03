@@ -63,7 +63,6 @@ function validateToken(loginToken) {
 
 async function _createLikedSongs(owner) {
     const likedSongs = {
-        _id: makeId(),
         name: 'Liked Songs',
         description: '',
         imgUrl: 'https://t.scdn.co/images/3099b3803ad9496896c43f22fe9be8c4.png',
@@ -73,16 +72,16 @@ async function _createLikedSongs(owner) {
     return await stationService.add(likedSongs)
 }
 
-function makeId(length = 24) {
-    var txt = ''
-    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+// function makeId(length = 24) {
+//     var txt = ''
+//     var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
-    for (var i = 0; i < length; i++) {
-        txt += possible.charAt(Math.floor(Math.random() * possible.length))
-    }
+//     for (var i = 0; i < length; i++) {
+//         txt += possible.charAt(Math.floor(Math.random() * possible.length))
+//     }
 
-    return txt
-}
+//     return txt
+// }
 
 // ;(async ()=>{
 //     await signup('bubu', '123', 'Bubu Bi')

@@ -22,6 +22,7 @@ export async function getStations(req, res) {
 export async function getStationById(req, res) {
   try {
     const stationId = req.params.id
+    console.log(stationId.length)
     const station = await stationService.getById(stationId)
     res.json(station)
   } catch (err) {
