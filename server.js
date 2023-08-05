@@ -29,7 +29,7 @@ import { authRoutes } from './api/auth/auth.routes.js'
 import { userRoutes } from './api/user/user.routes.js'
 import { stationRoutes } from './api/station/station.routes.js'
 // import { reviewRoutes } from './api/review/review.routes.js'
-// import { setupSocketAPI } from './services/socket.service.js'
+import { setupSocketAPI } from './services/socket.service.js'
 
 // routes
 import { setupAsyncLocalStorage } from './middlewares/setupAls.middleware.js'
@@ -39,7 +39,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/station', stationRoutes)
 // app.use('/api/review', reviewRoutes)
-// setupSocketAPI(server)
+setupSocketAPI(server)
 
 // Make every server-side-route to match the index.html
 // so when requesting http://localhost:3030/index.html/station/123 it will still respond with
