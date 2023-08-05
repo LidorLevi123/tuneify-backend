@@ -44,10 +44,12 @@ export function setupSocketAPI(http) {
             logger.info(`Removing socket.userId for socket [id: ${socket.id}]`)
             delete socket.userId
         })
-        socket.on('broadcast-track', trackInfo => {
-            logger.info(`User [id: ${socket.id}] broadcasted track [id: ${trackInfo.id} ]`)
-
-            socket.broadcast.to(socket.myTopic).emit('broadcast-track', trackInfo)
+        socket.on('broadcast-track', data => {
+            logger.info(`User [id: ${socket.id}] broadcasted track [idx: ${data.trackIdx} ]`)
+            socket.broadcast.to(socket.myTopic).emit('broadcast-track', data)
+        })
+        socket.on('pause-track', () => {
+            socket.broadcast.to(socket.myTopic).emit('pause-track')
         })
     })
 }
