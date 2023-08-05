@@ -48,6 +48,10 @@ export function setupSocketAPI(http) {
             logger.info(`User [id: ${socket.id}] broadcasted track [id: ${trackInfo.id} ]`)
 
             socket.broadcast.to(socket.myTopic).emit('broadcast-track', trackInfo)
+            console.log(trackInfo)
+        }),
+        socket.on('track-dragged', dragResult => {
+            socket.broadcast.to(socket.myTopic).emit('track-dragged', dragResult)
         })
     })
 }
