@@ -41,7 +41,7 @@ async function signup({username, password, fullname, imgUrl }) {
 
     const user = await userService.add({ username, password: hash, fullname, imgUrl, stationIds: [] })
     const likedStation = await _createLikedSongs({fullname, _id: user._id, imgUrl })
-    return await userService.update({ ...user, likedId: likedStation._id})
+    return await userService.update({ ...user, likedId: likedStation._id.toString()})
 }
 
 function getLoginToken(user) {

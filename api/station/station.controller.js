@@ -10,7 +10,6 @@ export async function getStations(req, res) {
     //   txt: req.query.txt || '',
     //   pageIdx: req.query.pageIdx
     // }
-
     const stations = await stationService.query(req.query.userId)
     res.json(stations)
   } catch (err) {

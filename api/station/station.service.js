@@ -5,43 +5,28 @@ import mongodb from 'mongodb'
 
 const { ObjectId } = mongodb
 
-const PAGE_SIZE = 3
-
-
-// async function query() {
-//     try {
-
-//         const collection = await dbService.getCollection('station')
-//         var stationCursor = await collection.find(criteria)
-
-//         const stations = stationCursor.toArray()
-
-//         return stations
-//     } catch (err) {
-//         logger.error('cannot find stations', err)
-//         throw err
-//     }
-// }
+// const PAGE_SIZE = 3
 
 async function query(userId) {
     try {
         const userCollection = await dbService.getCollection('user')
         const user = await userCollection.findOne({ _id: ObjectId(userId) })
-
+        
         const likedStationId = ObjectId(user.likedId)
         const stationIds = user.stationIds.map(id => ObjectId(id))
-
+        
         const stationCollection = await dbService.getCollection('station')
         const stationCursor = await stationCollection.find({
             _id: { $in: [likedStationId, ...stationIds] }
         })
-
+        
         const stations = await stationCursor.toArray()
         const likedStationIndex = stations.findIndex(station => station._id.equals(likedStationId))
-
+        
         const likedStation = stations.splice(likedStationIndex, 1)[0]
         stations.unshift(likedStation)
-
+        
+        console.log(stations);
         return stations
     } catch (err) {
         logger.error('cannot find stations', err)
