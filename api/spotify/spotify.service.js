@@ -1,16 +1,16 @@
-import config from 'dotenv'
+import axios from 'axios'
+import dotenv from 'dotenv'
+dotenv.config()
 
 export const spotifyService = {
     getAccessToken
 }
 
-console.log(process.env)
-
 async function getAccessToken() {
-
+    
     try {
         // Encode client credentials (Client ID and Client Secret)
-        const credentials = `${config.clientId}:${config.clientSecret}`
+        const credentials = `${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`
         const encodedCredentials = btoa(credentials)
         // Make a POST request to the token endpoint
         const response = await axios.post(

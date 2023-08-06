@@ -1,6 +1,7 @@
+import { logger } from '../../services/logger.service.js'
 import { spotifyService } from './spotify.service.js'
 
-export async function getAccessToken(res) {
+export async function getAccessToken(req, res) {
     try {
         const accessToken = await spotifyService.getAccessToken()
         res.send(accessToken)
