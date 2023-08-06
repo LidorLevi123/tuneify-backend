@@ -72,17 +72,6 @@ async function _createLikedSongs(owner) {
     return await stationService.add(likedSongs)
 }
 
-// function makeId(length = 24) {
-//     var txt = ''
-//     var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-
-//     for (var i = 0; i < length; i++) {
-//         txt += possible.charAt(Math.floor(Math.random() * possible.length))
-//     }
-
-//     return txt
-// }
-
 // ;(async ()=>{
 //     await signup('bubu', '123', 'Bubu Bi')
 //     await signup('mumu', '123', 'Mumu Maha')

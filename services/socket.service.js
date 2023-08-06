@@ -50,7 +50,7 @@ export function setupSocketAPI(http) {
         })
         socket.on('pause-track', () => {
             socket.broadcast.to(socket.myTopic).emit('pause-track')
-            console.log(trackInfo)
+            // console.log(trackInfo)
         }),
         socket.on('track-dragged', dragResult => {
             socket.broadcast.to(socket.myTopic).emit('track-dragged', dragResult)
