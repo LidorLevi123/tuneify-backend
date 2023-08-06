@@ -26,7 +26,6 @@ async function query(userId) {
         const likedStation = stations.splice(likedStationIndex, 1)[0]
         stations.unshift(likedStation)
         
-        console.log(stations);
         return stations
     } catch (err) {
         logger.error('cannot find stations', err)
