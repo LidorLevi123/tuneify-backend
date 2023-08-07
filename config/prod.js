@@ -1,4 +1,7 @@
+import dotenv from 'dotenv'
+dotenv.config()
+
 export default {
-  dbURL: 'mongodb+srv://mainUser:ab123@cluster0.hmffezu.mongodb.net/',
+  dbURL: process.env.DB_URL,
   dbName : 'Tuneify'
 }

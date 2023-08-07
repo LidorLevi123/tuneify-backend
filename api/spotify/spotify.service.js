@@ -7,11 +7,11 @@ export const spotifyService = {
 }
 
 async function getAccessToken() {
-    
     try {
         // Encode client credentials (Client ID and Client Secret)
         const credentials = `${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`
-        const encodedCredentials = btoa(credentials)
+        const encodedCredentials = Buffer.from(credentials).toString('base64')
+        
         // Make a POST request to the token endpoint
         const response = await axios.post(
             'https://accounts.spotify.com/api/token',
@@ -27,15 +27,13 @@ async function getAccessToken() {
         )
         // Extract and return the access token from the response
         const { data } = response
-        const accessToken = data.access_token
-        const expiresIn = data.expires_in
 
-        return accessToken
-    } catch (error) {
+        return data.access_token
+    } catch (err) {
         console.error(
             'Error retrieving access token:',
-            error.response ? error.response.data : error.message
+            err.response ? err.response.data : err.message
         )
-        throw error
+        throw err
     }
 }
