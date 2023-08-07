@@ -14,16 +14,28 @@ export function setupSocketAPI(http) {
         socket.on('disconnect', socket => {
             logger.info(`Socket disconnected [id: ${socket.id}]`)
         })
-        socket.on('chat-set-topic', topic => {
-            console.log('entered chat-set-topic')
-            console.log('topic', socket.myTopic)
+        socket.on('chat-set-topic', async topic => {
             if (socket.myTopic === topic) return
             if (socket.myTopic) {
                 socket.leave(socket.myTopic)
+                const topicUserIds = await _getAllTopicUserIds(socket.myTopic)
+                gIo.to(socket.myTopic).emit('set-topic-users', topicUserIds)
                 logger.info(`Socket is leaving topic ${socket.myTopic} [id: ${socket.id}]`)
             }
             socket.join(topic)
             socket.myTopic = topic
+            console.log('entered chat-set-topic', socket.myTopic)
+        })
+        socket.on('chat-leave-topic', topic => {
+            if (socket.myTopic === topic) {
+                socket.leave(socket.myTopic)
+                delete socket.myTopic
+            }
+            logger.info(`Socket is leaving topic ${socket.myTopic} [id: ${socket.id}]`)
+        })
+        socket.on('get-topic-users', async topic => {
+            const topicUserIds = await _getAllTopicUserIds(topic)
+            gIo.to(topic).emit('set-topic-users', topicUserIds)
         })
         socket.on('chat-send-msg', msg => {
             logger.info(`New chat msg from socket [id: ${socket.id}], emitting to topic ${socket.myTopic}`)
@@ -107,6 +119,14 @@ async function _getAllSockets() {
     // return all Socket instances
     const sockets = await gIo.fetchSockets()
     return sockets
+}
+
+async function _getAllTopicUserIds(topic) {
+    const sockets = await _getAllSockets()
+    const topicSockets = sockets.filter(socket => socket.myTopic === topic)
+    const topicUserIds = topicSockets.map(socket => socket.userId)
+
+    return topicUserIds
 }
 
 async function _printSockets() {
