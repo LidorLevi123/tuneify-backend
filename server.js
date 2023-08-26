@@ -15,11 +15,11 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.resolve('public')))
 } else {
     const corsOptions = {
-        origin: [   'http://127.0.0.1:3000',
-                    'http://localhost:3000',
-                    'http://127.0.0.1:5173',
-                    'http://localhost:5173'
-                ],
+        origin: ['http://127.0.0.1:3000',
+            'http://localhost:3000',
+            'http://127.0.0.1:5173',
+            'http://localhost:5173'
+        ],
         credentials: true
     }
     app.use(cors(corsOptions))
@@ -28,6 +28,7 @@ if (process.env.NODE_ENV === 'production') {
 import { authRoutes } from './api/auth/auth.routes.js'
 import { userRoutes } from './api/user/user.routes.js'
 import { spotifyRoutes } from './api/spotify/spotify.routes.js'
+import { youtubeRoutes } from './api/youtube/youtube.routes.js'
 import { stationRoutes } from './api/station/station.routes.js'
 import { setupSocketAPI } from './services/socket.service.js'
 
@@ -39,6 +40,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/station', stationRoutes)
 app.use('/api/spotify', spotifyRoutes)
+app.use('/api/youtube', youtubeRoutes)
 setupSocketAPI(server)
 
 // Make every server-side-route to match the index.html
@@ -49,6 +51,7 @@ app.get('/**', (req, res) => {
 })
 
 import { logger } from './services/logger.service.js'
+
 const port = process.env.PORT || 3030
 server.listen(port, () => {
     logger.info('Server is running on port: ' + port)
