@@ -9,8 +9,8 @@ export const youtubeService = {
 let currApiKeyIdx = 0
 
 export async function getYoutubeId(term, retryCount = 0) {
-    if (retryCount >= (API_KEYS.length * 2)) return console.log('Tried all api keys unsuccessfully')
     const API_KEYS = process.env.API_KEYS.split(',')
+    if (retryCount >= (API_KEYS.length * 2)) return console.log('Tried all api keys unsuccessfully')
 
     const currApiKey = API_KEYS[currApiKeyIdx]
     const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&videoEmbeddable=true&type=video&key=${currApiKey}&q=${term}`
