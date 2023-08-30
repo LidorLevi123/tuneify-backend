@@ -13,6 +13,7 @@
     "author": "Me",
     "license": "ISC",
     "dependencies": {
+        "@flytri/lyrics-finder": "^1.0.7",
         "axios": "^1.4.0",
         "bcrypt": "^5.0.0",
         "cookie-parser": "^1.4.6",
@@ -24,6 +25,6 @@
         "socket.io": "^4.7.2"
     },
     "devDependencies": {
-        "nodemon": "^2.0.20"
+        "nodemon": "^3.0.1"
     }
 }
