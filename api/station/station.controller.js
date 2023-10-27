@@ -1,15 +1,11 @@
-import {stationService} from './station.service.js'
-import {logger} from '../../services/logger.service.js'
+import { stationService } from './station.service.js'
+import { logger } from '../../services/logger.service.js'
 
 export async function getStations(req, res) {
   try {
 
     logger.debug('Getting Stations:', req.query)
 
-    // const filterBy = {
-    //   txt: req.query.txt || '',
-    //   pageIdx: req.query.pageIdx
-    // }
     const stations = await stationService.query(req.query.userId)
     res.json(stations)
   } catch (err) {
@@ -30,11 +26,11 @@ export async function getStationById(req, res) {
 }
 
 export async function addStation(req, res) {
-  const {loggedinUser} = req
+  const { loggedinUser } = req
 
   try {
     const station = req.body
-    if(station.isEmpty) station.owner = loggedinUser
+    if (station.isEmpty) station.owner = loggedinUser
     delete station.isEmpty
     const addedStation = await stationService.add(station)
     res.json(addedStation)
@@ -68,36 +64,23 @@ export async function removeStation(req, res) {
   }
 }
 
-export async function addStationMsg(req, res) {
-  const {loggedinUser} = req
+export async function getAllStations(req, res) {
   try {
-    const stationId = req.params.id
-    const msg = {
-      txt: req.body.txt,
-      by: loggedinUser
-    }
-    const savedMsg = await stationService.addStationMsg(stationId, msg)
-    res.json(savedMsg)
+    const stations = await stationService.getAllStations()
+    res.send(stations)
   } catch (err) {
-    logger.error('Failed to update station', err)
-    res.status(400).send({ err: 'Failed to update station' })
-
+    logger.error('Failed to get all stations', err)
+    res.status(400).send({ err: 'Failed to get all stations' })
   }
 }
 
-export async function removeStationMsg(req, res) {
-  const {loggedinUser} = req
+export async function removeStationsByName(req, res) {
   try {
-    const stationId = req.params.id
-    const {msgId} = req.params
-
-    const removedId = await stationService.removeStationMsg(stationId, msgId)
-    res.send(removedId)
+    const term = req.params.name
+    const stationsDeletedNum = await stationService.removeStationsByName(term)
+    res.json(stationsDeletedNum)
   } catch (err) {
-    logger.error('Failed to remove station msg', err)
-    res.status(400).send({ err: 'Failed to remove station msg' })
-
+    logger.error('Failed to delete stations', err)
+    res.status(400).send({ err: 'Failed to delete stations' })
   }
 }
-
-

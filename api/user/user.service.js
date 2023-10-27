@@ -1,8 +1,7 @@
-import {dbService} from '../../services/db.service.js'
-import {logger} from '../../services/logger.service.js'
-import {reviewService} from '../review/review.service.js'
+import { dbService } from '../../services/db.service.js'
+import { logger } from '../../services/logger.service.js'
 import mongodb from 'mongodb'
-const {ObjectId} = mongodb
+const { ObjectId } = mongodb
 
 export const userService = {
     add,            // Create (Signup)
@@ -21,8 +20,6 @@ async function query(filterBy = {}) {
         users = users.map(user => {
             delete user.password
             user.createdAt = ObjectId(user._id).getTimestamp()
-            // Returning fake fresh data
-            // user.createdAt = Date.now() - (1000 * 60 * 60 * 24 * 3) // 3 days ago
             return user
         })
         return users
@@ -37,13 +34,8 @@ async function getById(userId) {
     try {
         const collection = await dbService.getCollection('user')
         const user = await collection.findOne({ _id: ObjectId(userId) })
+        if (!user) return null
         delete user.password
-
-        user.givenReviews = await reviewService.query({ byUserId: ObjectId(user._id) })
-        user.givenReviews = user.givenReviews.map(review => {
-            delete review.byUser
-            return review
-        })
 
         return user
     } catch (err) {
@@ -73,6 +65,7 @@ async function remove(userId) {
 }
 
 async function update(user) {
+
     try {
         // peek only updatable properties
         const userToSave = {
@@ -80,7 +73,8 @@ async function update(user) {
             fullname: user.fullname,
             likedId: user.likedId,
             stationIds: user.stationIds,
-            imgUrl: user.imgUrl
+            imgUrl: user.imgUrl,
+            isAdmin: user.isAdmin
         }
 
         const collection = await dbService.getCollection('user')
@@ -123,9 +117,6 @@ function _buildCriteria(filterBy) {
                 fullname: txtCriteria
             }
         ]
-    }
-    if (filterBy.minBalance) {
-        criteria.score = { $gte: filterBy.minBalance }
     }
     return criteria
 }

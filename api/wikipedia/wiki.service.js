@@ -1,28 +1,7 @@
 import axios from 'axios'
 
 export const wikiService = {
-    getArtistImage,
     getWikipediaSnippet
-}
-async function getArtistImage(query) {
-    try {
-        const apiUrl = `https://api.deezer.com/search/artist?q=${query}`
-        const response = await axios.get(apiUrl)
-
-        if (response.status !== 200) {
-            throw new Error('Network response was not ok')
-        }
-
-        const data = response.data.data
-
-        if (data && data.length > 0) {
-            return data[0].picture_big
-        } else {
-            console.log('No matching artist found.')
-        }
-    } catch (error) {
-        console.error('Error:', error)
-    }
 }
 
 async function getWikipediaSnippet(searchQuery) {

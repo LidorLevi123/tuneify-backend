@@ -1,32 +1,36 @@
-import {dbService} from '../../services/db.service.js'
-import {logger} from '../../services/logger.service.js'
-import {utilService} from '../../services/util.service.js'
+import { dbService } from '../../services/db.service.js'
+import { logger } from '../../services/logger.service.js'
 import mongodb from 'mongodb'
 
 const { ObjectId } = mongodb
-
-// const PAGE_SIZE = 3
 
 async function query(userId) {
     try {
         const userCollection = await dbService.getCollection('user')
         const user = await userCollection.findOne({ _id: ObjectId(userId) })
-        
+
         const likedStationId = ObjectId(user.likedId)
         const stationIds = user.stationIds.map(id => ObjectId(id))
-        
+
         const stationCollection = await dbService.getCollection('station')
         const stationCursor = await stationCollection.find({
             _id: { $in: [likedStationId, ...stationIds] }
         })
-        
+
+        // uncomment to delete all user stations but liked songs
+        // await userCollection.updateOne(
+        //     { _id: ObjectId(userId) },
+        //     { $set: { stationIds: [] } }
+        // )
+
         const stations = await stationCursor.toArray()
+        const sortedStations = stationIds.map(id => stations.find(station => station._id.equals(id)))
         const likedStationIndex = stations.findIndex(station => station._id.equals(likedStationId))
-        
+
         const likedStation = stations.splice(likedStationIndex, 1)[0]
-        stations.unshift(likedStation)
-        
-        return stations
+        sortedStations.unshift(likedStation)
+
+        return sortedStations
     } catch (err) {
         logger.error('cannot find stations', err)
         throw err
@@ -37,7 +41,7 @@ async function getById(stationId) {
     try {
         const collection = await dbService.getCollection('station')
         let station
-        if(stationId.length < 24) station = await collection.findOne({ spotifyId: stationId })
+        if (stationId.length < 24) station = await collection.findOne({ spotifyId: stationId })
         else station = await collection.findOne({ _id: ObjectId(stationId) })
         return station
     } catch (err) {
@@ -85,28 +89,36 @@ async function update(station) {
     }
 }
 
-async function addStationMsg(stationId, msg) {
+async function getAllStations() {
     try {
-        msg.id = utilService.makeId()
         const collection = await dbService.getCollection('station')
-        await collection.updateOne({ _id: ObjectId(stationId) }, { $push: { msgs: msg } })
-        return msg
+        const stations = await collection.find().toArray()
+        return stations
     } catch (err) {
-        logger.error(`cannot add station msg ${stationId}`, err)
+        logger.error('cannot find stations', err)
         throw err
     }
 }
 
-async function removeStationMsg(stationId, msgId) {
+async function removeStationsByName(term) {
     try {
         const collection = await dbService.getCollection('station')
-        await collection.updateOne({ _id: ObjectId(stationId) }, { $pull: { msgs: {id: msgId} } })
-        return msgId
+
+        const regex = new RegExp(term, 'i')
+
+        const result = await collection.deleteMany({
+            name: { $regex: regex },
+            'owner.fullname': 'Tuneify'
+        })
+
+        console.log("Deleted", result.deletedCount, "stations")
+        return result.deletedCount
     } catch (err) {
-        logger.error(`cannot add station msg ${stationId}`, err)
+        logger.error('Error while deleting stations', err)
         throw err
     }
 }
+
 
 export const stationService = {
     remove,
@@ -114,6 +126,6 @@ export const stationService = {
     getById,
     add,
     update,
-    addStationMsg,
-    removeStationMsg
+    getAllStations,
+    removeStationsByName
 }
