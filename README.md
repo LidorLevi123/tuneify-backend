@@ -1,1 +1,1 @@
-Coding Academy - production ready server 
+see fronend repository for details - [https://github.com/LidorLevi123/tuneify-frontend](https://github.com/LidorLevi123/tuneify-frontend)
