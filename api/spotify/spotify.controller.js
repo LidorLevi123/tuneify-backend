@@ -10,3 +10,13 @@ export async function getSpotifyItems(req, res) {
         res.status(400).send({ err: 'Failed to get spotify items' })
     }
 }
+
+export async function getStationsForHome(req, res) {
+    try {
+        const stations = await spotifyService.getStationsForHome()
+        res.send(stations)
+    } catch (err) {
+        logger.error('Cannot get stations for home', err)
+        res.status(400).send({ err: 'Failed to get stations for home' })
+    }
+}

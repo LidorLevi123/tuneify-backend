@@ -4,7 +4,8 @@ import { logger } from '../../services/logger.service.js'
 dotenv.config()
 
 export const spotifyService = {
-    getSpotifyItems
+    getSpotifyItems,
+    getStationsForHome,
 }
 
 let gAccessToken = await getAccessToken()
@@ -187,4 +188,53 @@ async function _cleanArtistData(data) {
 
 function _cleanArtists(artists) {
     return artists.map((artist) => artist.name)
+}
+
+
+async function getStationsForHome() {
+    const categories = [
+        { id: 'toplists', name: 'Top Lists' },
+        { id: 'featured', name: 'Featured Playlists' },
+        { id: '0JQ5DAqbMKFLVaM30PMBm4', name: 'Summer' },
+        { id: '0JQ5DAqbMKFAXlCG6QvYQ4', name: 'Workout' },
+        { id: '0JQ5DAqbMKFzHmL4tf05da', name: 'Mood' },
+        { id: '0JQ5DAqbMKFQIL0AXnG5AK', name: 'Trending' },
+        { id: '0JQ5DAqbMKFAQy4HL4XU2D', name: 'Travel' },
+        { id: '0JQ5DAqbMKFRKBHIxJ5hMm', name: 'Tastemakers' },
+        { id: '0JQ5DAqbMKFIVNxQgRNSg0', name: 'Decades' },
+        { id: '0JQ5DAqbMKFEC4WFtoNRpw', name: 'Pop' },
+        { id: '0JQ5DAqbMKFPrEiAOxgac3', name: 'Classical' },
+        { id: '0JQ5DAqbMKFCfObibaOZbv', name: 'Gaming' },
+    ]
+
+    const results = []
+
+    try {
+        for (const category of categories) {
+            let stations
+            if (category.id === 'featured') {
+                const featured = await getSpotifyItems({ type: 'featured' })
+                stations = featured.map((item) => ({ ...item, category: category.name, categoryId: category.id }))
+            } else {
+                stations = await getSpotifyItems({ type: 'categoryStations', id: category.id })
+                stations = stations.map((station) => ({ ...station, category: category.name, categoryId: category.id }))
+            }
+            results.push(stations)
+        }
+
+        const filteredResults = results.filter(stationsArray => stationsArray.length > 8)
+        _cleanDescriptions(filteredResults)
+        return filteredResults
+    } catch (error) {
+        console.error(`Error fetching data: ${error.message}`)
+        throw new Error('Failed to fetch station data')
+    }
+}
+
+// cleans descriptions from <a> tags
+function _cleanDescriptions(arr) {
+    arr.forEach(item => {
+        if (Array.isArray(item)) _cleanDescriptions(item)
+        else if (typeof item === 'object') item.description = item.description.replace(/<a\b[^>]*>.*?<\/a>/gi, '')
+    })
 }
