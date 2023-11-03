@@ -89,8 +89,9 @@ function _getEndpoints(id, query) {
         featured: `https://api.spotify.com/v1/browse/featured-playlists?country=IL&locale=he_IL&limit=50`,
         station: `https://api.spotify.com/v1/playlists/${id}`,
         tracks: `https://api.spotify.com/v1/playlists/${id}/tracks`,
-        search: `https://api.spotify.com/v1/search?q=${query}&type=track,playlist&limit=20`,
-        artist: `https://api.spotify.com/v1/artists/${id}`
+        search: `https://api.spotify.com/v1/search?q=${query}&type=track,playlist,album&limit=20`,
+        artist: `https://api.spotify.com/v1/artists/${id}`,
+        album: `https://api.spotify.com/v1/albums/${id}`,
     }
 }
 
@@ -114,6 +115,8 @@ async function _cleanResponseData(data, type) {
         case 'artist':
             cleanData = await _cleanArtistData(data)
             break
+        case 'album':
+            cleanData = _cleanAlbumData(data)
     }
     return cleanData
 }
@@ -128,6 +131,34 @@ async function _cleanStationData(data) {
         tracks: await getSpotifyItems({ type: 'tracks', id: data.id }),
     }
     return station
+}
+
+function _cleanAlbumData(data) {
+    return {
+        spotifyId: data.id,
+        name: data.name,
+        imgUrl: data.images[0].url,
+        releaseDate: data.release_date,
+        artists: _cleanArtists(data.artists),
+        owner: { fullname: data.artists[0].name },
+        label: data.label,
+        tracks: _cleanAlbumTracksData(data.tracks.items, data.images),
+        isAlbum: true
+    }
+}
+
+function _cleanAlbumTracksData(data, imgUrls) {
+    return data.map(track => {
+        return {
+            id: track.id,
+            title: track.name,
+            artists: _cleanArtists(track.artists),
+            artistId: track.artists[0].id,
+            formalDuration: track.duration_ms,
+            youtubeId: '',
+            imgUrl: imgUrls
+        }
+    })
 }
 
 function _cleanCategoryStationsData(data) {
@@ -174,7 +205,16 @@ async function _cleanSearchData(data) {
         description: station.description.replace(/<a\b[^>]*>(.*?)<\/a>/gi, '')
     }))
 
-    return { tracks, stations }
+    const albums = data.albums.items.map(album => ({
+        spotifyId: album.id,
+        name: album.name,
+        artists: _cleanArtists(album.artists),
+        imgUrl: album.images[0].url,
+        releaseDate: album.release_date,
+        isAlbum: true
+    }))
+
+    return { tracks, stations, albums }
 }
 
 async function _cleanArtistData(data) {
