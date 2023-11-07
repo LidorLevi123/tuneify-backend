@@ -108,7 +108,8 @@ async function removeStationsByName(term) {
 
         const result = await collection.deleteMany({
             name: { $regex: regex },
-            'owner.fullname': 'Tuneify'
+            name: { $ne: 'Liked songs' },
+            stations: { $exists: false },
         })
 
         console.log("Deleted", result.deletedCount, "stations")

@@ -89,9 +89,12 @@ function _getEndpoints(id, query) {
         featured: `https://api.spotify.com/v1/browse/featured-playlists?country=IL&locale=he_IL&limit=50`,
         station: `https://api.spotify.com/v1/playlists/${id}`,
         tracks: `https://api.spotify.com/v1/playlists/${id}/tracks`,
-        search: `https://api.spotify.com/v1/search?q=${query}&type=track,playlist,album&limit=20`,
+        search: `https://api.spotify.com/v1/search?q=${query}&type=track,playlist,album,artist&limit=20`,
         artist: `https://api.spotify.com/v1/artists/${id}`,
         album: `https://api.spotify.com/v1/albums/${id}`,
+        artistTopTracks: `https://api.spotify.com/v1/artists/${id}/top-tracks?market=IL`,
+        artistAlbums: `https://api.spotify.com/v1/artists/${id}/albums?limit=50`,
+        artistRelatedArtists: `https://api.spotify.com/v1/artists/${id}/related-artists`,
     }
 }
 
@@ -117,8 +120,61 @@ async function _cleanResponseData(data, type) {
             break
         case 'album':
             cleanData = _cleanAlbumData(data)
+            break
+        case 'artistTopTracks':
+            cleanData = _cleanArtistTopTracksData(data)
+            break
+        case 'artistAlbums':
+            cleanData = _cleanArtistAlbumsData(data)
+            break
+        case 'artistRelatedArtists':
+            cleanData = _cleanArtistRelatedArtistsData(data)
+            break
     }
     return cleanData
+}
+
+
+function _cleanArtistRelatedArtistsData(data) {
+    return data.artists.map(artist => {
+        return {
+            spotifyId: artist.id,
+            name: artist.name,
+            imgUrl: artist.images[1]?.url,
+            isArtist: true
+        }
+    })
+}
+
+function _cleanArtistAlbumsData(data) {
+    return data.items.map(album => {
+        return {
+            spotifyId: album.id,
+            name: album.name,
+            imgUrl: album.images[1].url,
+            releaseDate: album.release_date,
+            artists: _cleanArtists(album.artists),
+            type: album.album_type,
+            group: album.album_group,
+            isAlbum: true
+        }
+    })
+}
+
+function _cleanArtistTopTracksData(data) {
+    return data.tracks.map(track => {
+        return {
+            id: track.id,
+            title: track.name,
+            artists: _cleanArtists(track.artists),
+            artistId: track.artists[0].id,
+            imgUrl: track.album.images,
+            formalDuration: track.duration_ms,
+            album: track.album.name,
+            albumId: track.album.id,
+            youtubeId: ''
+        }
+    })
 }
 
 async function _cleanStationData(data) {
@@ -181,6 +237,7 @@ function _cleanStationTracksData(data) {
             imgUrl: item.track.album.images,
             formalDuration: item.track.duration_ms,
             album: item.track.album.name,
+            albumId: item.track.album.id,
             youtubeId: ''
         }
     })
@@ -195,6 +252,7 @@ async function _cleanSearchData(data) {
         imgUrl: track.album.images,
         formalDuration: track.duration_ms,
         album: track.album.name,
+        albumId: track.album.id,
         youtubeId: ''
     }))
 
@@ -214,7 +272,14 @@ async function _cleanSearchData(data) {
         isAlbum: true
     }))
 
-    return { tracks, stations, albums }
+    const artists = data.artists.items.map(artist => ({
+        spotifyId: artist.id,
+        name: artist.name,
+        imgUrl: artist.images[1]?.url,
+        isArtist: true
+    }))
+
+    return { tracks, stations, albums, artists }
 }
 
 async function _cleanArtistData(data) {
@@ -222,12 +287,17 @@ async function _cleanArtistData(data) {
         spotifyId: data.id,
         name: data.name,
         imgUrl: data.images[0].url,
-        followers: data.followers.total
+        followers: data.followers.total,
+        isArtist: true,
+        owner: { fullname: data.name },
     }
 }
 
 function _cleanArtists(artists) {
-    return artists.map((artist) => artist.name)
+    return artists.map((artist) => ({
+        name: artist.name,
+        spotifyId: artist.id
+    }))
 }
 
 
@@ -249,26 +319,26 @@ async function getStationsForHome() {
 
     const results = []
 
-    try {
-        for (const category of categories) {
+    for (const category of categories) {
+        try {
             let stations
             if (category.id === 'featured') {
                 const featured = await getSpotifyItems({ type: 'featured' })
                 stations = featured.map((item) => ({ ...item, category: category.name, categoryId: category.id }))
             } else {
-                stations = await getSpotifyItems({ type: 'categoryStations', id: category.id })
+                stations = await getSpotifyItems({ type: 'categoryStations', id: category.id });
                 stations = stations.map((station) => ({ ...station, category: category.name, categoryId: category.id }))
             }
             results.push(stations)
+        } catch (error) {
+            console.error(`Error fetching data for category ${category.name}: ${error.message}`)
+            results.push([])
         }
-
-        const filteredResults = results.filter(stationsArray => stationsArray.length > 8)
-        _cleanDescriptions(filteredResults)
-        return filteredResults
-    } catch (error) {
-        console.error(`Error fetching data: ${error.message}`)
-        throw new Error('Failed to fetch station data')
     }
+
+    const filteredResults = results.filter((stationsArray) => stationsArray.length > 8);
+    _cleanDescriptions(filteredResults)
+    return filteredResults
 }
 
 // cleans descriptions from <a> tags
