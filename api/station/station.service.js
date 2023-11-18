@@ -17,14 +17,11 @@ async function query(userId) {
             _id: { $in: [likedStationId, ...stationIds] }
         })
 
-        // uncomment to delete all user stations but liked songs
-        // await userCollection.updateOne(
-        //     { _id: ObjectId(userId) },
-        //     { $set: { stationIds: [] } }
-        // )
-
         const stations = await stationCursor.toArray()
-        const sortedStations = stationIds.map(id => stations.find(station => station._id.equals(id)))
+        const sortedStations = stationIds
+            .map(id => stations.find(station => station._id.equals(id)))
+            .filter(station => station !== undefined)
+
         const likedStationIndex = stations.findIndex(station => station._id.equals(likedStationId))
 
         const likedStation = stations.splice(likedStationIndex, 1)[0]
@@ -78,7 +75,8 @@ async function update(station) {
             name: station.name,
             description: station.description,
             tracks: station.tracks,
-            imgUrl: station.imgUrl
+            imgUrl: station.imgUrl,
+            snapshot_id: station.snapshot_id
         }
         const collection = await dbService.getCollection('station')
         await collection.updateOne({ _id: ObjectId(station._id) }, { $set: stationToSave })
@@ -107,12 +105,15 @@ async function removeStationsByName(term) {
         const regex = new RegExp(term, 'i')
 
         const result = await collection.deleteMany({
-            name: { $regex: regex },
-            name: { $ne: 'Liked songs' },
-            stations: { $exists: false },
+            $and: [
+                { name: { $regex: regex } },
+                { name: { $ne: 'Liked Songs' } },
+                { stations: { $exists: false } },
+                { 'owner._id': { $exists: true } }
+            ]
         })
 
-        console.log("Deleted", result.deletedCount, "stations")
+        console.log('Deleted', result.deletedCount, 'stations')
         return result.deletedCount
     } catch (err) {
         logger.error('Error while deleting stations', err)

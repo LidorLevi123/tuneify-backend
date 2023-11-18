@@ -6,7 +6,7 @@ export async function login(req, res) {
     const { username, password } = req.body
     try {
         const loggedinUser = authService.validateToken(req.cookies.loginToken)
-        console.log('loggedinUser', loggedinUser);
+
         if (loggedinUser) {
             const signedInUser = await userService.getById(loggedinUser._id)
             if (signedInUser) return res.json(signedInUser)

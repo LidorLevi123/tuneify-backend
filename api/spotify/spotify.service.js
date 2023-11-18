@@ -95,6 +95,7 @@ function _getEndpoints(id, query) {
         artistTopTracks: `https://api.spotify.com/v1/artists/${id}/top-tracks?market=IL`,
         artistAlbums: `https://api.spotify.com/v1/artists/${id}/albums?limit=50`,
         artistRelatedArtists: `https://api.spotify.com/v1/artists/${id}/related-artists`,
+        recommendations: `https://api.spotify.com/v1/recommendations?limit=100&seed_tracks=${id}`
     }
 }
 
@@ -122,6 +123,7 @@ async function _cleanResponseData(data, type) {
             cleanData = _cleanAlbumData(data)
             break
         case 'artistTopTracks':
+        case 'recommendations':
             cleanData = _cleanArtistTopTracksData(data)
             break
         case 'artistAlbums':
@@ -185,6 +187,7 @@ async function _cleanStationData(data) {
         description: data.description.replace(/<a\b[^>]*>(.*?)<\/a>/gi, ''),
         owner: { fullname: 'Tuneify' },
         tracks: await getSpotifyItems({ type: 'tracks', id: data.id }),
+        snapshot_id: data.snapshot_id
     }
     return station
 }
@@ -218,29 +221,34 @@ function _cleanAlbumTracksData(data, imgUrls) {
 }
 
 function _cleanCategoryStationsData(data) {
-    return data.playlists.items.map(item => ({
-        spotifyId: item.id ? item.id : '0',
-        name: item.name,
-        imgUrl: item.images[0].url,
-        description: item.description.replace(/<a\b[^>]*>(.*?)<\/a>/gi, '')
-    }))
+    return data.playlists.items
+        .filter(item => item !== null)
+        .map(item => ({
+            spotifyId: item.id ? item.id : '0',
+            name: item.name,
+            imgUrl: (item.images && item.images.length > 0) ? item.images[0].url : '',
+            description: item.description ? item.description.replace(/<a\b[^>]*>(.*?)<\/a>/gi, '') : '',
+            snapshot_id: item.snapshot_id
+        }))
 }
 
 function _cleanStationTracksData(data) {
-    return data.items.map(item => {
-        return {
-            addedAt: item.added_at,
-            id: item.track.id,
-            title: item.track.name,
-            artists: _cleanArtists(item.track.artists),
-            artistId: item.track.artists[0].id,
-            imgUrl: item.track.album.images,
-            formalDuration: item.track.duration_ms,
-            album: item.track.album.name,
-            albumId: item.track.album.id,
-            youtubeId: ''
-        }
-    })
+    return data.items
+        .filter(item => item.track !== null)
+        .map(item => {
+            return {
+                addedAt: item.added_at,
+                id: item.track.id,
+                title: item.track.name,
+                artists: _cleanArtists(item.track.artists),
+                artistId: item.track.artists[0].id,
+                imgUrl: item.track.album.images,
+                formalDuration: item.track.duration_ms,
+                album: item.track.album.name,
+                albumId: item.track.album.id,
+                youtubeId: ''
+            }
+        })
 }
 
 async function _cleanSearchData(data) {
