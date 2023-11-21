@@ -6,7 +6,7 @@ export const youtubeService = {
     getYoutubeId
 }
 
-let currApiKeyIdx = 0
+let currApiKeyIdx = 2
 
 export async function getYoutubeId(term, retryCount = 0) {
     const API_KEYS = process.env.API_KEYS.split(',')
