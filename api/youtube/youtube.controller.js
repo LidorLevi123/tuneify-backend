@@ -6,8 +6,8 @@ export async function getYoutubeId(req, res) {
     const term = req.query[0]
 
     try {
-        const youtubeData = await youtubeService.getYoutubeId(term)
-        res.json(youtubeData.items[0].id.videoId)
+        const youtubeApiData = await youtubeService.getYoutubeId(term)
+        res.json(youtubeApiData)
     } catch (err) {
         logger.error('Cannot get data from YouTube API', err)
         res.status(400).json({ error: 'Failed to get data from YouTube API' })

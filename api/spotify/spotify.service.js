@@ -221,8 +221,6 @@ function _cleanAlbumTracksData(data, imgUrls) {
 }
 
 function _cleanCategoryStationsData(data) {
-    console.log("🚀 ~ file: spotify.service.js:224 ~ _cleanCategoryStationsData ~ data:", data)
-
     return data.playlists.items
         .filter(item => item !== null)
         .map(item => ({
