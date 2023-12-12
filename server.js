@@ -33,6 +33,7 @@ import { stationRoutes } from './api/station/station.routes.js'
 import { setupSocketAPI } from './services/socket.service.js'
 import { lyricsRoutes } from './api/lyrics/lyrics.routes.js'
 import { wikiRoutes } from './api/wikipedia/wiki.routes.js'
+import { loggerRoutes } from './api/log/log.routes.js'
 
 // routes
 import { setupAsyncLocalStorage } from './middlewares/setupAls.middleware.js'
@@ -45,6 +46,7 @@ app.use('/api/spotify', spotifyRoutes)
 app.use('/api/youtube', youtubeRoutes)
 app.use('/api/lyrics', lyricsRoutes)
 app.use('/api/wiki', wikiRoutes)
+app.use('/api/log', loggerRoutes)
 setupSocketAPI(server)
 
 // Make every server-side-route to match the index.html
