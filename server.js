@@ -34,6 +34,7 @@ import { setupSocketAPI } from './services/socket.service.js'
 import { lyricsRoutes } from './api/lyrics/lyrics.routes.js'
 import { wikiRoutes } from './api/wikipedia/wiki.routes.js'
 import { loggerRoutes } from './api/log/log.routes.js'
+import { ticketmasterRoutes } from './api/events/ticketmaster.routes.js'
 
 // routes
 import { setupAsyncLocalStorage } from './middlewares/setupAls.middleware.js'
@@ -47,6 +48,7 @@ app.use('/api/youtube', youtubeRoutes)
 app.use('/api/lyrics', lyricsRoutes)
 app.use('/api/wiki', wikiRoutes)
 app.use('/api/log', loggerRoutes)
+app.use('/api/events', ticketmasterRoutes)
 setupSocketAPI(server)
 
 // Make every server-side-route to match the index.html
