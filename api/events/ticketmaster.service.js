@@ -8,7 +8,8 @@ export async function getEventsAndSocials(term) {
 
     try {
         const { artistId, socials } = await _getArtistId(term)
-        const url = `https://app.ticketmaster.com/discovery/v2/events.json?attractionId=${artistId}&apikey=8kfpKEoGriG9egdiA6vEub0q0nJA5J73&sort=date,asc`
+
+        const url = `https://app.ticketmaster.com/discovery/v2/events.json?attractionId=${artistId}&apikey=${process.env.TICKETMASTER}&sort=date,asc`
         const res = await axios.get(url)
         const data = res.data._embedded.events
 
@@ -56,7 +57,7 @@ function _formatTime(time) {
 
 
 async function _getArtistId(term) {
-    const url = `https://app.ticketmaster.com/discovery/v2/attractions.json?keyword=${term}&apikey=8kfpKEoGriG9egdiA6vEub0q0nJA5J73`;
+    const url = `https://app.ticketmaster.com/discovery/v2/attractions.json?keyword=${term}&apikey=${process.env.TICKETMASTER}`;
     try {
         const response = await axios.get(url)
         const artistId = response.data._embedded.attractions[0].id
