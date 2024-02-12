@@ -12,8 +12,9 @@ export async function getSpotifyItems(req, res) {
 }
 
 export async function getStationsForHome(req, res) {
+    const market = req.params.market
     try {
-        const stations = await spotifyService.getStationsForHome()
+        const stations = await spotifyService.getStationsForHome(market)
         res.send(stations)
     } catch (err) {
         logger.error('Cannot get stations for home', err)

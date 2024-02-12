@@ -54,7 +54,7 @@ function setTokenRefreshInterval() {
 }
 
 async function getSpotifyItems(req) {
-    const { type, id, query } = req
+    const { type, id, query, market } = req
     if (!gAccessToken) gAccessToken = await getAccessToken()
 
     const endpoints = _getEndpoints(id, query)
@@ -65,6 +65,9 @@ async function getSpotifyItems(req) {
             headers: {
                 Authorization: `Bearer ${gAccessToken}`,
             },
+            params: {
+                market
+            }
         })
         // Clean and return the data from response
         let cleanData = await _cleanResponseData(response.data, type)
@@ -309,7 +312,7 @@ function _cleanArtists(artists) {
 }
 
 
-async function getStationsForHome() {
+async function getStationsForHome(market) {
     const categories = [
         { id: 'toplists', name: 'Top Lists' },
         { id: 'featured', name: 'Featured Playlists' },
@@ -331,10 +334,10 @@ async function getStationsForHome() {
         try {
             let stations
             if (category.id === 'featured') {
-                const featured = await getSpotifyItems({ type: 'featured' })
+                const featured = await getSpotifyItems({ type: 'featured', market })
                 stations = featured.map((item) => ({ ...item, category: category.name, categoryId: category.id }))
             } else {
-                stations = await getSpotifyItems({ type: 'categoryStations', id: category.id });
+                stations = await getSpotifyItems({ type: 'categoryStations', id: category.id, market });
                 stations = stations.map((station) => ({ ...station, category: category.name, categoryId: category.id }))
             }
             results.push(stations)
