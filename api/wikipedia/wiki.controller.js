@@ -6,7 +6,7 @@ export async function getArtistData(req, res) {
 
     try {
         const artistSnippet = await wikiService.getWikipediaSnippet(term)
-        res.json(artistSnippet)
+        res.send(artistSnippet)
     } catch (err) {
         logger.error('Cannot get data from API', err)
         res.status(400).json({ error: 'Failed to get data from API' })
