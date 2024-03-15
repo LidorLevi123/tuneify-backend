@@ -2,8 +2,9 @@ import { logger } from '../../services/logger.service.js'
 import { ticketmasterService } from './ticketmaster.service.js'
 
 export async function getEventsAndSocials(req, res) {
+    const { artist } = req.query
     try {
-        const eventsAndSocials = await ticketmasterService.getEventsAndSocials(req.query[0])
+        const eventsAndSocials = await ticketmasterService.getEventsAndSocials(artist)
         res.json(eventsAndSocials)
     } catch (err) {
         logger.error('Cannot get event and socials', err)
