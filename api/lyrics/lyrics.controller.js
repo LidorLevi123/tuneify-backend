@@ -2,7 +2,8 @@ import { logger } from '../../services/logger.service.js'
 import { lyricsService } from './lyrics.service.js'
 
 export async function getLyrics(req, res) {
-    const term = req.query[0]
+    const { term } = req.query
+    console.log(`Getting lyrics for: ${term}`);
 
     try {
         const lyrics = await lyricsService.getLyrics(term)
