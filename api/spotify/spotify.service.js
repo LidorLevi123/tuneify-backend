@@ -190,7 +190,8 @@ async function _cleanStationData(data) {
         description: data.description.replace(/<a\b[^>]*>(.*?)<\/a>/gi, ''),
         owner: { fullname: 'Tuneify' },
         tracks: await getSpotifyItems({ type: 'tracks', id: data.id }),
-        snapshot_id: data.snapshot_id
+        snapshot_id: data.snapshot_id,
+        lastUpdate: Date.now()
     }
     return station
 }
