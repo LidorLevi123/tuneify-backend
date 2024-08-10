@@ -35,6 +35,8 @@ async function signup({ username, password, fullname, imgUrl }) {
     if (!username || !password || !fullname) return Promise.reject('Missing required signup information')
 
     const userExist = await userService.getByUsername(username)
+    console.log(userExist);
+    
     if (userExist) return Promise.reject('Username already taken')
 
     const hash = await bcrypt.hash(password, saltRounds)
