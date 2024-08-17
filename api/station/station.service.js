@@ -122,6 +122,16 @@ async function removeStationsByName(term) {
     }
 }
 
+async function getTopTen() {
+    const collection = await dbService.getCollection('track')
+
+    const topTenTracks = await collection.find()
+      .sort({ numsPlayed: -1 })
+      .limit(10) 
+      .toArray()
+
+    return topTenTracks
+}
 
 export const stationService = {
     remove,
@@ -130,5 +140,6 @@ export const stationService = {
     add,
     update,
     getAllStations,
-    removeStationsByName
+    removeStationsByName,
+    getTopTen
 }

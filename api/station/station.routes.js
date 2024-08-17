@@ -1,7 +1,7 @@
 import express from 'express'
 import { requireAdmin, requireAuth } from '../../middlewares/requireAuth.middleware.js'
 import { log } from '../../middlewares/logger.middleware.js'
-import { getStations, getStationById, addStation, updateStation, removeStation, getAllStations, removeStationsByName } from './station.controller.js'
+import { getStations, getStationById, addStation, updateStation, removeStation, getAllStations, removeStationsByName, getTopTen } from './station.controller.js'
 
 const router = express.Router()
 
@@ -10,6 +10,7 @@ const router = express.Router()
 
 router.get('/', log, getStations)
 router.get('/getall', requireAuth, requireAdmin, getAllStations)
+router.get('/topten', getTopTen)
 router.get('/:id', getStationById)
 router.post('/', requireAuth, addStation)
 router.put('/:id', requireAuth, updateStation)

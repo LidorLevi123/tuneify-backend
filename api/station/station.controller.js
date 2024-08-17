@@ -84,3 +84,13 @@ export async function removeStationsByName(req, res) {
     res.status(400).send({ err: 'Failed to delete stations' })
   }
 }
+
+export async function getTopTen(req, res) {
+  try {
+    const topTen = await stationService.getTopTen()
+    res.json(topTen)
+  } catch (err) {
+    logger.error('Failed to get top ten stations', err)
+    res.status(400).send({ err: 'Failed to get top ten stations' })
+  }
+}
