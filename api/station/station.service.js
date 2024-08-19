@@ -8,6 +8,13 @@ async function query(userId) {
     try {
         const userCollection = await dbService.getCollection('user')
         const user = await userCollection.findOne({ _id: ObjectId(userId) })
+        const lastOnline = new Date().toLocaleString()
+
+        if (user.username !== 'guest') {
+            await userCollection.findOneAndUpdate(
+                { _id: ObjectId(userId) },
+                { $set: { lastOnline } },
+        )}
 
         const likedStationId = ObjectId(user.likedId)
         const stationIds = user.stationIds.map(id => ObjectId(id))
