@@ -37,25 +37,17 @@ export async function getStationById(req, res) {
 }
 
 function _getOpenGraphMetaTags(station) {
-  const artists = station.artists.map(a => a.name).join(', ')
-  const releaseYear = station.releaseDate.split('-')[0]
-  const image = station.tracks[0].imgUrl[1].url
+  const { name, artists, releaseDate, tracks } = station
+  const artistsStr = artists.map(a => a.name).join(', ')
+  const releaseYear = releaseDate.split('-')[0]
+  const image = tracks[0].imgUrl[1].url
   
   return `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <!-- Open Graph Meta Tags -->
-            <meta property="og:title" content="${station.name}" />
-            <meta property="og:description" content="Song • ${artists} • ${releaseYear}" />
-            <meta property="og:image" content="${image}" />
-        </head>
-        <script>
-            window.location.href = "https://tuneify.onrender.com/#/album/${station.spotifyId}"
-        </script>
-        </html>
+        <meta property="og:title" content="${name}" />
+        <meta property="og:description" content="Song • ${artistsStr} • ${releaseYear}" />
+        <meta property="og:image" content="${image}" />
+        <meta property="og:url" content="https://tuneify.onrender.com/#/station/${station.spotifyId}" />
+        <script>window.location.href = "https://tuneify.onrender.com/#/album/${station.spotifyId}"</script>
       `
 }
 
