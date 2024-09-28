@@ -26,8 +26,6 @@ export async function getStationById(req, res) {
 
     if (isCrawler) {
       const htmlContent = _getOpenGraphMetaTags(station)
-      console.log(htmlContent);
-      
       res.setHeader('Content-Type', 'text/html')
       res.send(htmlContent)
 
