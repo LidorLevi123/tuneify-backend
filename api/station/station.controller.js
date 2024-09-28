@@ -46,8 +46,6 @@ function _getOpenGraphMetaTags(station) {
         <meta property="og:title" content="${name}" />
         <meta property="og:description" content="Song • ${artistsStr} • ${releaseYear}" />
         <meta property="og:image" content="${image}" />
-        <meta property="og:url" content="https://tuneify.onrender.com/#/station/${station.spotifyId}" />
-        <script>window.location.href = "https://tuneify.onrender.com/#/album/${station.spotifyId}"</script>
       `
 }
 
