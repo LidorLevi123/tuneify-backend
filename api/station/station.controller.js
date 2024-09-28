@@ -1,5 +1,6 @@
 import { stationService } from './station.service.js'
 import { logger } from '../../services/logger.service.js'
+import { spotifyService } from '../spotify/spotify.service.js'
 
 export async function getStations(req, res) {
   try {
@@ -16,8 +17,7 @@ export async function getStations(req, res) {
 export async function getStationById(req, res) {
   try {
     const stationId = req.params.id
-    const station = await stationService.getById(stationId)
-
+    let station = await stationService.getById(stationId)
     // Check if the request is coming from a crawler (like WhatsApp) or a typical API client
     const isCrawler =
       (req.headers['user-agent'] &&
@@ -25,6 +25,10 @@ export async function getStationById(req, res) {
       req.query.preview === 'true' // Optionally detect preview mode using a query param
 
     if (isCrawler) {
+      if (!station) { 
+        station = await spotifyService.getSpotifyItems({ type: 'album', id: stationId })
+      }
+
       const htmlContent = _getOpenGraphMetaTags(station)
       res.setHeader('Content-Type', 'text/html')
       res.send(htmlContent)
