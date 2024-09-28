@@ -26,6 +26,8 @@ export async function getStationById(req, res) {
 
     if (isCrawler) {
       const htmlContent = _getOpenGraphMetaTags(station)
+      console.log(htmlContent);
+      
       res.setHeader('Content-Type', 'text/html')
       res.send(htmlContent)
 
@@ -37,8 +39,6 @@ export async function getStationById(req, res) {
 }
 
 function _getOpenGraphMetaTags(station) {
-  console.log(station.artists);
-  
   const artists = station.artists.map(a => a.name).join(', ')
   const releaseYear = station.releaseDate.split('-')[0]
   const image = station.tracks[0].imgUrl[1].url
@@ -54,6 +54,9 @@ function _getOpenGraphMetaTags(station) {
             <meta property="og:description" content="Song • ${artists} • ${releaseYear}" />
             <meta property="og:image" content="${image}" />
         </head>
+        <script>
+            window.location.href = "https://tuneify.onrender.com/#/album/${station.spotifyId}"
+        </script>
         </html>
       `
 }
