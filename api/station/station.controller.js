@@ -3,7 +3,6 @@ import { logger } from '../../services/logger.service.js'
 
 export async function getStations(req, res) {
   try {
-
     logger.debug('Getting Stations:', req.query)
 
     const stations = await stationService.query(req.query.userId)
@@ -18,11 +17,45 @@ export async function getStationById(req, res) {
   try {
     const stationId = req.params.id
     const station = await stationService.getById(stationId)
-    res.json(station)
+
+    // Check if the request is coming from a crawler (like WhatsApp) or a typical API client
+    const isCrawler =
+      (req.headers['user-agent'] &&
+        req.headers['user-agent'].includes('WhatsApp')) ||
+      req.query.preview === 'true' // Optionally detect preview mode using a query param
+
+    if (isCrawler) {
+      const htmlContent = _getOpenGraphMetaTags(station)
+      res.setHeader('Content-Type', 'text/html')
+      res.send(htmlContent)
+
+    } else res.json(station)
   } catch (err) {
     logger.error('Failed to get station', err)
-    res.status(400).send({ err: 'Failed to get station' })
+    res.status(500).send({ err: 'Failed to get station' })
   }
+}
+
+function _getOpenGraphMetaTags(station) {
+  console.log(station.artists);
+  
+  const artists = station.artists.map(a => a.name).join(', ')
+  const releaseYear = station.releaseDate.split('-')[0]
+  const image = station.tracks[0].imgUrl[1].url
+  
+  return `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <!-- Open Graph Meta Tags -->
+            <meta property="og:title" content="${station.name}" />
+            <meta property="og:description" content="Song • ${artists} • ${releaseYear}" />
+            <meta property="og:image" content="${image}" />
+        </head>
+        </html>
+      `
 }
 
 export async function addStation(req, res) {
@@ -40,7 +73,6 @@ export async function addStation(req, res) {
   }
 }
 
-
 export async function updateStation(req, res) {
   try {
     const station = req.body
@@ -49,7 +81,6 @@ export async function updateStation(req, res) {
   } catch (err) {
     logger.error('Failed to update station', err)
     res.status(400).send({ err: 'Failed to update station' })
-
   }
 }
 
