@@ -40,15 +40,16 @@ import { ticketmasterRoutes } from './api/events/ticketmaster.routes.js'
 import { setupAsyncLocalStorage } from './middlewares/setupAls.middleware.js'
 app.all('*', setupAsyncLocalStorage)
 
-app.use('/api/auth', authRoutes)
-app.use('/api/user', userRoutes)
-app.use('/api/station', stationRoutes)
-app.use('/api/spotify', spotifyRoutes)
-app.use('/api/youtube', youtubeRoutes)
-app.use('/api/lyrics', lyricsRoutes)
-app.use('/api/wiki', wikiRoutes)
-app.use('/api/log', loggerRoutes)
-app.use('/api/events', ticketmasterRoutes)
+app.use('/auth', authRoutes)
+app.use('/user', userRoutes)
+app.use('/station', stationRoutes)
+app.use('/album', stationRoutes)
+app.use('/spotify', spotifyRoutes)
+app.use('/youtube', youtubeRoutes)
+app.use('/lyrics', lyricsRoutes)
+app.use('/wiki', wikiRoutes)
+app.use('/log', loggerRoutes)
+app.use('/events', ticketmasterRoutes)
 setupSocketAPI(server)
 
 // Make every server-side-route to match the index.html

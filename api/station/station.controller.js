@@ -15,7 +15,7 @@ export async function getStations(req, res) {
 }
 
 export async function getStationById(req, res) {
-  try {
+  try { 
     const stationId = req.params.id
     let station = await stationService.getById(stationId)
     // Check if the request is coming from a crawler (like WhatsApp) or a typical API client
@@ -42,13 +42,14 @@ export async function getStationById(req, res) {
 
 function _getOpenGraphMetaTags(station) {
   const { name, artists, releaseDate, tracks } = station
-  const artistsStr = artists.map(a => a.name).join(', ')
-  const releaseYear = releaseDate.split('-')[0]
-  const image = tracks[0].imgUrl[1].url
+  const artistsStr = artists?.map(a => a.name).join(', ') || station.description
+  const releaseYear = releaseDate?.split('-')[0] || ''
+  const image = station.isAlbum ? tracks[0].imgUrl[1].url : station.imgUrl
+  const type = station.isAlbum ? 'Song' : 'Playlist'
   
   return `
         <meta property="og:title" content="${name}" />
-        <meta property="og:description" content="Song • ${artistsStr} • ${releaseYear}" />
+        <meta property="og:description" content="${type} • ${artistsStr} • ${releaseYear}" />
         <meta property="og:image" content="${image}" />
       `
 }
