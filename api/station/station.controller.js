@@ -16,17 +16,18 @@ export async function getStations(req, res) {
 
 export async function getStationById(req, res) {
   try { 
-    const stationId = req.params.id
-    let station = await stationService.getById(stationId)
-    // Check if the request is coming from a crawler (like WhatsApp) or a typical API client
-    const isCrawler =
-      (req.headers['user-agent'] &&
-        req.headers['user-agent'].includes('WhatsApp')) ||
-      req.query.preview === 'true' // Optionally detect preview mode using a query param
+    const id = req.params.id
+    const type = req.baseUrl.slice(1)
+    let station = await stationService.getById(id)
 
+    // Check if the request is coming from a crawler (like WhatsApp) or a typical API client
+    const crawlerKeywords = ['bot', 'crawler', 'spider', 'facebook', 'linkedin', 'twitter', 'instagram', 'whatsapp']
+    const isCrawler =
+      crawlerKeywords.some(keyword => req.headers['user-agent'].toLowerCase().includes(keyword))
+      
     if (isCrawler) {
       if (!station) { 
-        station = await spotifyService.getSpotifyItems({ type: 'album', id: stationId })
+        station = await spotifyService.getSpotifyItems({ type, id })
       }
 
       const htmlContent = _getOpenGraphMetaTags(station)
@@ -45,11 +46,12 @@ function _getOpenGraphMetaTags(station) {
   const artistsStr = artists?.map(a => a.name).join(', ') || station.description
   const releaseYear = releaseDate?.split('-')[0] || ''
   const image = station.isAlbum ? tracks[0].imgUrl[1].url : station.imgUrl
-  const type = station.isAlbum ? 'Song' : 'Playlist'
+  const type = station.isAlbum ? 'Album' : station.isTrack ? 'Song' : 'Playlist'
+  const description = `${type} • ${artistsStr}${releaseYear ? ` • ${releaseYear}` : ''}`
   
   return `
         <meta property="og:title" content="${name}" />
-        <meta property="og:description" content="${type} • ${artistsStr} • ${releaseYear}" />
+        <meta property="og:description" content="${description}" />
         <meta property="og:image" content="${image}" />
       `
 }

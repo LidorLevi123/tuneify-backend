@@ -98,7 +98,8 @@ function _getEndpoints(id, query) {
         artistTopTracks: `https://api.spotify.com/v1/artists/${id}/top-tracks?market=IL`,
         artistAlbums: `https://api.spotify.com/v1/artists/${id}/albums?limit=50`,
         artistRelatedArtists: `https://api.spotify.com/v1/artists/${id}/related-artists`,
-        recommendations: `https://api.spotify.com/v1/recommendations?limit=100&seed_tracks=${id}`
+        recommendations: `https://api.spotify.com/v1/recommendations?limit=100&seed_tracks=${id}`,
+        track: `https://api.spotify.com/v1/tracks/${id}`
     }
 }
 
@@ -135,10 +136,36 @@ async function _cleanResponseData(data, type) {
         case 'artistRelatedArtists':
             cleanData = _cleanArtistRelatedArtistsData(data)
             break
+        case 'track':
+            cleanData = _cleanTrackData(data)
+            break
     }
     return cleanData
 }
 
+function _cleanTrackData(data) {
+    return {
+        id: data.id,
+        name: data.name,
+        description: '',
+        imgUrl: data.album.images[1].url,
+        formalDuration: data.duration_ms,
+        owner: { fullname: data.artists[0].name },
+        releaseDate: data.album.release_date.slice(0, 4),
+        artists: _cleanArtists(data.artists),
+        isTrack: true,
+        tracks: [{
+            id: data.id,
+            name: data.name,
+            artists: _cleanArtists(data.artists),
+            artistId: data.artists[0].id,
+            imgUrl: data.album.images,
+            formalDuration: data.duration_ms,
+            album: data.album.name,
+            albumId: data.album.id,
+        }],
+    }
+}
 
 function _cleanArtistRelatedArtistsData(data) {
     return data.artists.map(artist => {
