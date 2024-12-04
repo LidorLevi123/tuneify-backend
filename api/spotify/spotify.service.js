@@ -295,11 +295,13 @@ async function _cleanSearchData(data) {
         youtubeId: ''
     }))
 
-    const stations = data.playlists.items.map(station => ({
-        spotifyId: station.id,
-        name: station.name,
-        imgUrl: station.images[0].url,
-        description: station.description.replace(/<a\b[^>]*>(.*?)<\/a>/gi, '')
+    const stations = data.playlists.items
+        .filter(item => item !== null)
+        .map(station => ({
+            spotifyId: station.id,
+            name: station.name,
+            imgUrl: station.images[0].url,
+            description: station.description.replace(/<a\b[^>]*>(.*?)<\/a>/gi, '')
     }))
 
     const albums = data.albums.items.map(album => ({
@@ -317,6 +319,9 @@ async function _cleanSearchData(data) {
         imgUrl: artist.images[1]?.url,
         isArtist: true
     }))
+
+    console.log('Search data cleaned:', stations);
+    
 
     return { tracks, stations, albums, artists }
 }
